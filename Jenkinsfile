@@ -1,8 +1,8 @@
 pipeline{
     agent any
     tools {
-        jdk 'jdk17'
-        maven 'Maven3.9'
+        jdk 'Java17'
+        maven 'Maven3'
     }
     environment {
         APP_NAME = "spring-petclinic-pro"
@@ -44,7 +44,7 @@ pipeline{
         stage("Sonarqube Analysis") {
             steps {
                 script {
-                    withSonarQubeEnv(credentialsId: 'SonarQube-Token') {
+                    withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') {
                         sh "mvn sonar:sonar"
                     }
                 }
@@ -54,7 +54,7 @@ pipeline{
         stage("Quality Gate") {
             steps {
                 script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'SonarQube-Token'
+                    waitForQualityGate abortPipeline: false, credentialsId: 'jenkins-sonarqube-token'
                 }
             }
 
