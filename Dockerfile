@@ -7,7 +7,6 @@ COPY mvnw .
 COPY .mvn/ .mvn/
 COPY pom.xml .
 
-# Download dependencies (cache layer)
 RUN ./mvnw dependency:go-offline -B
 
 COPY src ./src
@@ -23,7 +22,5 @@ COPY --from=builder /app/target/*.jar app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-Dspring.data.mongodb.uri=mongodb://mongo:27017/spring-mongo", \
-            "-Djava.security.egd=file:/dev/./urandom", \
-            "-jar", "app.jar"]
-[I
+ENTRYPOINT ["java","-Dspring.data.mongodb.uri=mongodb://mongo:27017/spring-mongo","-Djava.security.egd=file:/dev/./urandom","-jar","app.jar"]
+
