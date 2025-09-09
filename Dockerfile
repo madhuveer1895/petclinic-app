@@ -3,21 +3,23 @@ FROM maven:3.9.9-eclipse-temurin-17 AS builder
 
 WORKDIR /app
 
-COPY mvnw .
-COPY .mvn/ .mvn/
 COPY pom.xml .
+COPY .mvn/ .mvn/
+COPY mvnw .
 
-RUN ./mvnw dependency:go-offline -B
+# Download dependencies
+RUN mvn dependency:go-offline -B -Dmaven.repo.local=/root/.m2/repository
 
+# Copy source
 COPY src ./src
 
-RUN ./mvnw clean package -DskipTests
+# Build the JAR
+RUN mvn clean package -DskipTests -Dmaven.repo.local=/root/.m2/repository
 
 # Stage 2: Runtime
 FROM openjdk:17-jdk-slim
 
 WORKDIR /opt/app
-
 COPY --from=builder /app/target/*.jar app.jar
 
 EXPOSE 8080
