@@ -1,11 +1,26 @@
+# Git
 .git
 .gitignore
+
+# Maven build output
+target
+
+# IDEs
 .idea
 .vscode
 *.iml
-*.log
+*.classpath
+*.project
+.settings
+.sts4-cache
+
+# OS files
 .DS_Store
 Thumbs.db
-docker-compose.yml
-Jenkinsfile
+
+# Logs
+*.log
+
+# Local env
+*.env
 

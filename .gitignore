@@ -1,29 +1,35 @@
-target/*
-.settings/*
+# Maven build
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+
+# Logs
+*.log
+
+# IDEs
+.idea/
+*.iml
 .classpath
 .project
+.settings/
 .factorypath
-.attach_pid*
-.idea
-*.iml
-/target
 .sts4-cache/
-.vscode/*
+
+# VS Code
+.vscode/
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-_site/
 
-target/
-!.mvn/wrapper/maven-wrapper.jar
-.mvn/timing.properties
-*.log
-.idea/
-.vscode/
-*.iml
-*.class
+# OS files
 .DS_Store
 Thumbs.db
+
+# Environment
 *.env
+
+# Others
+.attach_pid*
+_site/
 
