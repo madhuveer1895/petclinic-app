@@ -1,0 +1,37 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      run: springapp
+  template:
+    metadata:
+      labels:
+        run: springapp
+    spec:
+      containers:
+      - name: springapp
+        image: devopseasy/spring-petclinic-pro:1.0.0-1
+        ports:
+          - containerPort: 8080
+        imagePullPolicy: IfNotPresent
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: springapp
+  labels:
+    run: springapp
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    run: springapp

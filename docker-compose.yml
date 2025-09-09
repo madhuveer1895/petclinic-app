@@ -1,20 +1,9 @@
-version: "3.8"
-
-services:
-  mongo:
-    image: mongo:6
-    container_name: mongo
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
-
-  petclinic:
-    image: veer1522/petclinic-app:${IMAGE_TAG}
-    container_name: petclinic
-    depends_on:
-      - mongo
-    ports:
-      - "8080:8080"
-    environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/spring-mongo
-
+mysql:
+  image: mysql:5.7
+  ports:
+    - "3306:3306"
+  environment:
+    - MYSQL_ROOT_PASSWORD=petclinic
+    - MYSQL_DATABASE=petclinic
+  volumes:
+    - "./conf.d:/etc/mysql/conf.d:ro"
