@@ -1,15 +1,35 @@
-FROM openjdk:8-alpine
+# =========================
+# Stage 1: Build with Maven
+# =========================
+FROM maven:3.9.9-eclipse-temurin-17 AS builder
 
-# Required for starting application up.
-RUN apk update && apk add /bin/sh
+WORKDIR /app
 
-RUN mkdir -p /opt/app
-ENV PROJECT_HOME /opt/app
+# Copy pom.xml and download dependencies first (cache layer)
+COPY pom.xml .
+COPY .mvn/ .mvn
+COPY mvnw .
+RUN ./mvnw dependency:go-offline -B
 
-COPY target/*.jar $PROJECT_HOME/spring-petclinic-pro.jar
+# Copy the rest of the project
+COPY src src
 
-WORKDIR $PROJECT_HOME
+# Build the JAR (skip tests to save time here)
+RUN ./mvnw clean package -DskipTests
 
+# =========================
+# Stage 2: Run with JDK
+# =========================
+FROM openjdk:17-jdk-slim
+
+WORKDIR /opt/app
+
+# Copy only the built JAR from builder stage
+COPY --from=builder /app/target/*.jar app.jar
+
+# Expose app port
 EXPOSE 8080
 
-CMD ["java", "-Dspring.data.mongodb.uri=mongodb://mongo:27017/spring-mongo","-Djava.security.egd=file:/dev/./urandom","-jar","./spring-petclinic-pro.jar"]
+# Run the app with MongoDB URI
+ENTRYPOINT ["java", "-Dspring.data.mongodb.uri=mongodb://mongo:27017/spring-mongo", "-jar", "app.jar"]
+
