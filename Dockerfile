@@ -1,35 +1,39 @@
-# =========================
-# Stage 1: Build with Maven
-# =========================
-FROM maven:3.9.9-eclipse-temurin-17 AS builder
+# ----------------------
+# Stage 1: Build JAR
+# ----------------------
+FROM maven:3.8.7-openjdk-17-slim AS build
 
 WORKDIR /app
 
-# Copy pom.xml and download dependencies first (cache layer)
-COPY pom.xml .
-COPY .mvn/ .mvn
+# Copy Maven wrapper and pom.xml first (to leverage caching)
 COPY mvnw .
+COPY .mvn/ .mvn/
+COPY pom.xml .
+
+# Pre-download dependencies (cache layer)
 RUN ./mvnw dependency:go-offline -B
 
-# Copy the rest of the project
-COPY src src
-
-# Build the JAR (skip tests to save time here)
+# Copy full source and build
+COPY src ./src
 RUN ./mvnw clean package -DskipTests
 
-# =========================
-# Stage 2: Run with JDK
-# =========================
+
+# ----------------------
+# Stage 2: Runtime image
+# ----------------------
 FROM openjdk:17-jdk-slim
 
+# App directory
 WORKDIR /opt/app
 
-# Copy only the built JAR from builder stage
-COPY --from=builder /app/target/*.jar app.jar
+# Copy the JAR from build stage
+COPY --from=build /app/target/*.jar spring-petclinic-pro.jar
 
 # Expose app port
 EXPOSE 8080
 
-# Run the app with MongoDB URI
-ENTRYPOINT ["java", "-Dspring.data.mongodb.uri=mongodb://mongo:27017/spring-mongo", "-jar", "app.jar"]
+# Run with MongoDB connection string
+CMD ["java", "-Dspring.data.mongodb.uri=mongodb://mongo:27017/spring-mongo", \
+     "-Djava.security.egd=file:/dev/./urandom", \
+     "-jar", "spring-petclinic-pro.jar"]
 
